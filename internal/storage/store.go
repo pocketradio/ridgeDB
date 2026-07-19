@@ -1,8 +1,10 @@
 package storage
 
+import "time"
+
 type Value struct {
-	Data string
-	TTL  int64
+	Data      string
+	ExpiresAt time.Time
 }
 
 type Store struct {

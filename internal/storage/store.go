@@ -5,6 +5,7 @@ import "time"
 type Value struct {
 	Data      string
 	ExpiresAt time.Time
+	HasExpiry bool
 }
 
 type Store struct {

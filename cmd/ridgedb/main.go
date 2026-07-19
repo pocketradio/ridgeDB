@@ -1,8 +1,7 @@
 package main
 
 import (
-	"log"
-	"net"
+	"fmt"
 	"ridgeDB/internal/server"
 	"ridgeDB/internal/storage"
 )
@@ -10,19 +9,7 @@ import (
 func main() {
 	db := storage.NewStore()
 	go db.StartCleanup()
-
-	listener, err := net.Listen("tcp", ":8000")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			log.Print(err)
-			continue
-		}
-
-		go server.HandleConnection(conn)
-	}
+	fmt.Println("Starting server on port 8000...")
+	listener := server.Start()
+	server.Accept(listener)
 }

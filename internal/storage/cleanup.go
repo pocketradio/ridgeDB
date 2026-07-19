@@ -18,6 +18,5 @@ func (db *Store) StartCleanup() {
 			}
 		}
 		db.mu.Unlock()
-
 	}
 }

@@ -3,11 +3,17 @@ package storage
 import "time"
 
 func (db *Store) Set(key string, val Value) string {
+
+	db.mu.Lock()
+	defer db.mu.Unlock()
 	db.entries[key] = val
 	return "OK"
 }
 
 func (db *Store) Get(key string) (Value, bool) {
+
+	db.mu.Lock()
+	defer db.mu.Unlock()
 
 	value, ok := db.entries[key]
 
@@ -26,6 +32,9 @@ func (db *Store) Get(key string) (Value, bool) {
 }
 
 func (db *Store) Delete(key string) bool {
+
+	db.mu.Lock()
+	defer db.mu.Unlock()
 
 	_, ok := db.entries[key] // since delete is safe even if no key exists
 	if ok {

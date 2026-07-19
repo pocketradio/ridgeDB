@@ -1,6 +1,9 @@
 package storage
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 type Value struct {
 	Data      string
@@ -10,6 +13,7 @@ type Value struct {
 
 type Store struct {
 	entries map[string]Value
+	mu      sync.RWMutex
 }
 
 func NewStore() *Store {

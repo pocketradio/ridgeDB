@@ -5,13 +5,14 @@ import (
 	"strings"
 )
 
-func HandleCommand(s []string) error {
+func HandleCommand(s []string) (Command, error) {
+
 	method := strings.ToUpper(s[0])
 
 	switch method {
 	case "SET":
 		if len(s) != 3 {
-			return fmt.Errorf("usage: SET <key> <value>")
+			return Command{}, fmt.Errorf("usage: SET <key> <value>")
 		}
 
 		userKey := s[1]
@@ -22,7 +23,7 @@ func HandleCommand(s []string) error {
 
 	case "GET":
 		if len(s) != 2 {
-			return fmt.Errorf("usage: GET <key>")
+			return Command{}, fmt.Errorf("usage: GET <key>")
 		}
 
 		userKey := s[1]
@@ -31,7 +32,7 @@ func HandleCommand(s []string) error {
 
 	case "DEL":
 		if len(s) != 2 {
-			return fmt.Errorf("usage: DEL <key>")
+			return Command{}, fmt.Errorf("usage: DEL <key>")
 		}
 
 		userKey := s[1]
@@ -39,8 +40,23 @@ func HandleCommand(s []string) error {
 		_ = userKey
 
 	default:
-		return fmt.Errorf("unknown command: %s", method)
+		return Command{}, fmt.Errorf("unknown command: %s", method)
 	}
 
-	return nil
+	if method == "SET" {
+		cmd := Command{
+			Data:   s[2],
+			Method: method,
+			Key:    s[1],
+		}
+		return cmd, nil
+	}
+
+	cmd := Command{
+		Data:   "",
+		Method: method,
+		Key:    s[1],
+	}
+	return cmd, nil
+
 }

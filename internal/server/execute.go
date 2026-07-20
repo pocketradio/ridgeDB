@@ -5,21 +5,24 @@ import (
 	"time"
 )
 
-type CommandResult struct {
-	Status string // for set
-	Value  storage.Value
-	HasKey bool
-}
-
 func ExecuteCommand(db *storage.Store, cmd Command) CommandResult {
 	switch cmd.Method {
 	case "SET":
+		if cmd.Expiry {
+			_ = db.Set(cmd.Key, storage.Value{
+				Data:      cmd.Data,
+				HasExpiry: cmd.Expiry,
+				ExpiresAt: time.Now().Add(240 * time.Hour),
+			})
+
+			return CommandResult{Status: "OK"}
+		}
+
 		_ = db.Set(cmd.Key, storage.Value{
 			Data:      cmd.Data,
-			HasExpiry: true,
-			ExpiresAt: time.Now().Add(240 * time.Hour),
+			HasExpiry: cmd.Expiry,
+			ExpiresAt: time.Time{},
 		})
-
 		return CommandResult{Status: "OK"}
 
 	case "GET":

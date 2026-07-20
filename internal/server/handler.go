@@ -11,15 +11,17 @@ func HandleCommand(s []string) (Command, error) {
 
 	switch method {
 	case "SET":
-		if len(s) != 3 {
+		if len(s) != 4 {
 			return Command{}, fmt.Errorf("usage: SET <key> <value>")
 		}
 
 		userKey := s[1]
 		value := s[2]
+		expiry := s[3]
 
 		_ = userKey
 		_ = value
+		_ = expiry
 
 	case "GET":
 		if len(s) != 2 {
@@ -48,6 +50,7 @@ func HandleCommand(s []string) (Command, error) {
 			Data:   s[2],
 			Method: method,
 			Key:    s[1],
+			Expiry: strings.ToUpper(s[3]) == "TRUE",
 		}
 		return cmd, nil
 	}

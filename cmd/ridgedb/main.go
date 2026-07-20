@@ -11,5 +11,5 @@ func main() {
 	go db.StartCleanup()
 	fmt.Println("Starting server on port 8000...")
 	listener := server.Start()
-	server.Accept(listener)
+	server.Accept(db, listener)
 }

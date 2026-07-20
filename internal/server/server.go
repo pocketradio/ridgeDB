@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"ridgeDB/internal/parser"
+	"ridgeDB/internal/storage"
 )
 
 func Start() net.Listener {
@@ -17,7 +18,7 @@ func Start() net.Listener {
 	return listener
 }
 
-func Accept(listener net.Listener) {
+func Accept(db *storage.Store, listener net.Listener) {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
@@ -25,11 +26,11 @@ func Accept(listener net.Listener) {
 			continue
 		}
 
-		go HandleConnection(conn)
+		go HandleConnection(db, conn)
 	}
 }
 
-func HandleConnection(conn net.Conn) { // returns a *bufio.Reader
+func HandleConnection(db *storage.Store, conn net.Conn) { // returns a *bufio.Reader
 	defer conn.Close()
 	reader := bufio.NewReader(conn)
 
@@ -47,11 +48,14 @@ func HandleConnection(conn net.Conn) { // returns a *bufio.Reader
 			continue
 		}
 
-		err = HandleCommand(parsed_message)
+		cmd, err := HandleCommand(parsed_message)
+
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
+
+		ExecuteCommand(db, cmd)
 	}
 
 }

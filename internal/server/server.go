@@ -55,7 +55,26 @@ func HandleConnection(db *storage.Store, conn net.Conn) { // returns a *bufio.Re
 			continue
 		}
 
-		ExecuteCommand(db, cmd)
+		result := ExecuteCommand(db, cmd)
+
+		switch cmd.Method {
+		case "SET":
+			fmt.Fprintln(conn, result.Status)
+
+		case "GET":
+			if !result.HasKey {
+				fmt.Fprintln(conn, result.Status)
+			} else {
+				fmt.Fprintln(conn, result.Value.Data)
+			}
+
+		case "DEL":
+			fmt.Fprintln(conn, result.Status)
+
+		default:
+			fmt.Fprintln(conn, result.Status)
+		}
+
 	}
 
 }

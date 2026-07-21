@@ -30,7 +30,7 @@ func Accept(db *storage.Store, listener net.Listener) {
 	}
 }
 
-func HandleConnection(db *storage.Store, conn net.Conn) { // returns a *bufio.Reader
+func HandleConnection(db *storage.Store, conn net.Conn) {
 	defer conn.Close()
 	reader := bufio.NewReader(conn)
 
@@ -44,14 +44,14 @@ func HandleConnection(db *storage.Store, conn net.Conn) { // returns a *bufio.Re
 
 		parsed_message, err := parser.Parse(message)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(conn, err)
 			continue
 		}
 
 		cmd, err := HandleCommand(parsed_message)
 
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(conn, err)
 			continue
 		}
 

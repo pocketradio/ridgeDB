@@ -12,7 +12,7 @@ func HandleCommand(s []string) (Command, error) {
 	switch method {
 	case "SET":
 		if len(s) != 4 {
-			return Command{}, fmt.Errorf("usage: SET <key> <value>")
+			return Command{}, fmt.Errorf("usage: SET <key> <value> <expiry>")
 		}
 
 		userKey := s[1]

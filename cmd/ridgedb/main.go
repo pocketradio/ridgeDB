@@ -29,7 +29,6 @@ func main() {
 	fmt.Println("Port: ", *portPtr)
 
 	db := storage.NewStore()
-	go db.StartCleanup()
 
 	aof, err := persistence.Open()
 	if err != nil {
@@ -37,6 +36,8 @@ func main() {
 	}
 
 	listener := server.Start(*portPtr)
+	go db.StartCleanup()
+
 	srv := server.NewServer(db, aof, listener)
 	srv.Accept()
 

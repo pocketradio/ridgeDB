@@ -30,6 +30,6 @@ func main() {
 	db := storage.NewStore()
 	go db.StartCleanup()
 
-	listener := server.Start(portPtr)
+	listener := server.Start(*portPtr)
 	server.Accept(db, listener)
 }

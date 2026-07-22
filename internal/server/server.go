@@ -9,8 +9,9 @@ import (
 	"ridgeDB/internal/storage"
 )
 
-func Start() net.Listener {
-	listener, err := net.Listen("tcp", ":8000")
+func Start(port *string) net.Listener {
+
+	listener, err := net.Listen("tcp", *port)
 	if err != nil {
 		log.Fatal(err)
 	}

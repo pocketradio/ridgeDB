@@ -45,6 +45,11 @@ func ExecuteCommand(db *storage.Store, cmd Command, aof *persistence.AOF) (Comma
 		}, nil
 
 	case "DEL":
+		err := aof.AppendDel(cmd.Key)
+		if err != nil {
+			return CommandResult{}, err
+		}
+
 		_ = db.Delete(cmd.Key)
 
 		return CommandResult{

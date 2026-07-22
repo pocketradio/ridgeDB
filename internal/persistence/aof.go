@@ -36,3 +36,17 @@ func (a *AOF) AppendSet(key, value string, expiry bool) error {
 
 	return nil
 }
+
+func (a *AOF) AppendDel(key string) error {
+	_, err := fmt.Fprintf(a.file, "DEL %s\n", key)
+
+	if err != nil {
+		return err
+	}
+
+	if err := a.file.Sync(); err != nil {
+		return err
+	}
+
+	return nil
+}

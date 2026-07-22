@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"ridgeDB/internal/persistence"
 	"ridgeDB/internal/server"
 	"ridgeDB/internal/storage"
 	"strconv"
@@ -30,6 +31,13 @@ func main() {
 	db := storage.NewStore()
 	go db.StartCleanup()
 
+	aof, err := persistence.Open()
+	if err != nil {
+		log.Fatalf("failed to open AOF: %v", err)
+	}
+
 	listener := server.Start(*portPtr)
-	server.Accept(db, listener)
+	srv := server.NewServer(db, aof, listener)
+	srv.Accept()
+
 }

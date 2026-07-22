@@ -71,7 +71,16 @@ func (s *Server) HandleConnection(conn net.Conn) {
 			continue
 		}
 
-		result := ExecuteCommand(s.DB, cmd)
+		result, err := ExecuteCommand(s.DB, cmd, s.AOF)
+		if err != nil {
+			fmt.Fprintln(conn, err)
+			continue
+		}
+
+
+		if err != nil {
+			fmt.Fprintln(conn, err)
+		}
 
 		switch cmd.Method {
 		case "SET":

@@ -22,9 +22,9 @@ func Open() (*AOF, error) {
 	return NewAOF("ridgedb.aof")
 }
 
-func (a *AOF) AppendSet(key, value string) error {
+func (a *AOF) AppendSet(key, value string, expiry bool) error {
 
-	_, err := fmt.Fprintf(a.file, "SET %s %s\n", key, value)
+	_, err := fmt.Fprintf(a.file, "SET %s %s %t\n", key, value, expiry)
 
 	if err != nil {
 		return err

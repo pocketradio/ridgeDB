@@ -10,7 +10,7 @@ func ExecuteCommand(db *storage.Store, cmd Command, aof *persistence.AOF) (Comma
 	switch cmd.Method {
 	case "SET":
 
-		err := aof.AppendSet(cmd.Key, cmd.Data)
+		err := aof.AppendSet(cmd.Key, cmd.Data, cmd.Expiry)
 		if err != nil {
 			return CommandResult{}, err
 		}

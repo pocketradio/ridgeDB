@@ -6,8 +6,15 @@ import (
 	"log"
 	"net"
 	"ridgeDB/internal/parser"
+	"ridgeDB/internal/persistence"
 	"ridgeDB/internal/storage"
 )
+
+type Server struct {
+	DB       *storage.Store
+	AOF      *persistence.AOF
+	Listener net.Listener
+}
 
 func Start(port string) net.Listener {
 
@@ -19,19 +26,27 @@ func Start(port string) net.Listener {
 	return listener
 }
 
-func Accept(db *storage.Store, listener net.Listener) {
+func NewServer(db *storage.Store, aof *persistence.AOF, l net.Listener) *Server {
+	return &Server{
+		DB:       db,
+		AOF:      aof,
+		Listener: l,
+	}
+}
+
+func (s *Server) Accept() {
 	for {
-		conn, err := listener.Accept()
+		conn, err := s.Listener.Accept()
 		if err != nil {
 			log.Print(err)
 			continue
 		}
 
-		go HandleConnection(db, conn)
+		go s.HandleConnection(conn)
 	}
 }
 
-func HandleConnection(db *storage.Store, conn net.Conn) {
+func (s *Server) HandleConnection(conn net.Conn) {
 	defer conn.Close()
 	reader := bufio.NewReader(conn)
 
@@ -56,7 +71,7 @@ func HandleConnection(db *storage.Store, conn net.Conn) {
 			continue
 		}
 
-		result := ExecuteCommand(db, cmd)
+		result := ExecuteCommand(s.DB, cmd)
 
 		switch cmd.Method {
 		case "SET":

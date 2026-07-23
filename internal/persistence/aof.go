@@ -6,16 +6,17 @@ import (
 )
 
 type AOF struct {
-	file *os.File
+	File     *os.File
+	Filepath string
 }
 
-func NewAOF(filePath string) (*AOF, error) {
-	f, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+func NewAOF(path string) (*AOF, error) {
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		return nil, err
 	}
 
-	return &AOF{file: f}, nil
+	return &AOF{File: f, Filepath: path}, nil
 }
 
 func Open() (*AOF, error) {
@@ -24,13 +25,13 @@ func Open() (*AOF, error) {
 
 func (a *AOF) AppendSet(key, value string, expiry bool) error {
 
-	_, err := fmt.Fprintf(a.file, "SET %s %s %t\n", key, value, expiry)
+	_, err := fmt.Fprintf(a.File, "SET %s %s %t\n", key, value, expiry)
 
 	if err != nil {
 		return err
 	}
 
-	if err := a.file.Sync(); err != nil {
+	if err := a.File.Sync(); err != nil {
 		return err
 	}
 
@@ -38,13 +39,13 @@ func (a *AOF) AppendSet(key, value string, expiry bool) error {
 }
 
 func (a *AOF) AppendDel(key string) error {
-	_, err := fmt.Fprintf(a.file, "DEL %s\n", key)
+	_, err := fmt.Fprintf(a.File, "DEL %s\n", key)
 
 	if err != nil {
 		return err
 	}
 
-	if err := a.file.Sync(); err != nil {
+	if err := a.File.Sync(); err != nil {
 		return err
 	}
 

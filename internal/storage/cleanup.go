@@ -10,10 +10,11 @@ func (db *Store) StartCleanup() {
 
 		<-ticker.C // blocks until a tick is sent thru the chan
 		db.mu.Lock()
+		now := time.Now()
 
 		for i := range db.entries {
 
-			if db.entries[i].HasExpiry && db.entries[i].ExpiresAt.Before(time.Now()) {
+			if db.entries[i].HasExpiry && !db.entries[i].ExpiresAt.After(now) {
 				delete(db.entries, i)
 			}
 		}

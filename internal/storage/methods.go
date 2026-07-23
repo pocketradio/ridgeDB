@@ -18,7 +18,7 @@ func (db *Store) Get(key string) (Value, bool) {
 	value, ok := db.entries[key]
 
 	if ok {
-		if value.HasExpiry && value.ExpiresAt.Before(time.Now()) {
+		if value.HasExpiry && !value.ExpiresAt.After(time.Now()) {
 
 			ok = false
 			delete(db.entries, key)

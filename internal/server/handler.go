@@ -2,7 +2,9 @@ package server
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
+	"time"
 )
 
 func HandleCommand(s []string) (Command, error) {
@@ -12,12 +14,12 @@ func HandleCommand(s []string) (Command, error) {
 	switch method {
 	case "SET":
 		if len(s) != 4 {
-			return Command{}, fmt.Errorf("usage: SET <key> <value> <expiry>")
+			return Command{}, fmt.Errorf("usage: SET <key> <value> <ttl_seconds>")
 		}
 
-		expiry := strings.ToUpper(s[3])
-		if expiry != "TRUE" && expiry != "FALSE" {
-			return Command{}, fmt.Errorf("expiry must be true or false")
+		ttl, err := strconv.Atoi(s[3])
+		if err != nil || ttl < 0 {
+			return Command{}, fmt.Errorf("ttl must be a non-negative number")
 		}
 
 	case "GET":
@@ -35,11 +37,12 @@ func HandleCommand(s []string) (Command, error) {
 	}
 
 	if method == "SET" {
+		ttl, _ := strconv.Atoi(s[3])
 		cmd := Command{
 			Data:   s[2],
 			Method: method,
 			Key:    s[1],
-			Expiry: strings.ToUpper(s[3]) == "TRUE",
+			TTL:    time.Duration(ttl) * time.Second,
 		}
 		return cmd, nil
 	}

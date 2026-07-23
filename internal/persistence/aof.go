@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"time"
 )
 
 type AOF struct {
@@ -25,12 +26,12 @@ func Open() (*AOF, error) {
 	return NewAOF("ridgedb.aof")
 }
 
-func (a *AOF) AppendSet(key, value string, expiry bool) error {
+func (a *AOF) AppendSet(key, value string, expiresAt time.Time) error {
 
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
-	_, err := fmt.Fprintf(a.File, "SET %s %s %t\n", key, value, expiry)
+	_, err := fmt.Fprintf(a.File, "SET %s %s %d\n", key, value, expiresAt.Unix())
 
 	if err != nil {
 		return err

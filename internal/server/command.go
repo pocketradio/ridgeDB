@@ -1,12 +1,15 @@
 package server
 
-import "ridgeDB/internal/storage"
+import (
+	"ridgeDB/internal/storage"
+	"time"
+)
 
 type Command struct {
 	Method string
 	Key    string
 	Data   string
-	Expiry bool
+	TTL    time.Duration
 }
 
 type CommandResult struct {

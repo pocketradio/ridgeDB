@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"ridgeDB/internal/storage"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -38,14 +39,21 @@ func ReplayParse(db *storage.Store, s string) error {
 			return fmt.Errorf("invalid SET in AOF")
 		}
 
-		expiry := strings.ToUpper(parsedLine[3]) == "TRUE"
-		value := storage.Value{
-			Data:      parsedLine[2],
-			HasExpiry: expiry,
+		expiryUnix, err := strconv.ParseInt(parsedLine[3], 10, 64)
+		if err != nil || expiryUnix < 0 {
+			return fmt.Errorf("invalid expiry in AOF")
 		}
 
-		if expiry {
-			value.ExpiresAt = time.Now().Add(240 * time.Hour)
+		value := storage.Value{
+			Data:      parsedLine[2],
+			HasExpiry: expiryUnix > 0,
+		}
+
+		if expiryUnix > 0 {
+			value.ExpiresAt = time.Unix(expiryUnix, 0)
+			if value.ExpiresAt.Before(time.Now()) {
+				return nil
+			}
 		}
 
 		db.Set(parsedLine[1], value)

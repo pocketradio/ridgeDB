@@ -9,27 +9,21 @@ import (
 func ExecuteCommand(db *storage.Store, cmd Command, aof *persistence.AOF) (CommandResult, error) {
 	switch cmd.Method {
 	case "SET":
+		value := storage.Value{
+			Data: cmd.Data,
+		}
 
-		err := aof.AppendSet(cmd.Key, cmd.Data, cmd.Expiry)
+		if cmd.TTL > 0 {
+			value.HasExpiry = true
+			value.ExpiresAt = time.Now().Add(cmd.TTL)
+		}
+
+		err := aof.AppendSet(cmd.Key, cmd.Data, value.ExpiresAt)
 		if err != nil {
 			return CommandResult{}, err
 		}
-		if cmd.Expiry {
-			_ = db.Set(cmd.Key, storage.Value{
-				Data:      cmd.Data,
-				HasExpiry: cmd.Expiry,
-				ExpiresAt: time.Now().Add(240 * time.Hour),
-			})
 
-			return CommandResult{Status: "OK"}, nil
-		}
-
-		_ = db.Set(cmd.Key, storage.Value{
-			Data:      cmd.Data,
-			HasExpiry: cmd.Expiry,
-			ExpiresAt: time.Time{},
-		})
-
+		_ = db.Set(cmd.Key, value)
 		return CommandResult{Status: "OK"}, nil
 
 	case "GET":

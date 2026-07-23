@@ -35,6 +35,11 @@ func main() {
 		log.Fatalf("failed to open AOF: %v", err)
 	}
 
+	err = aof.Replay(db)
+	if err != nil {
+		log.Fatalf("failed to replay AOF: %v", err)
+	}
+
 	listener := server.Start(*portPtr)
 	go db.StartCleanup()
 

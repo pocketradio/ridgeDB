@@ -3,11 +3,13 @@ package persistence
 import (
 	"fmt"
 	"os"
+	"sync"
 )
 
 type AOF struct {
 	File     *os.File
 	Filepath string
+	mu       sync.Mutex
 }
 
 func NewAOF(path string) (*AOF, error) {
@@ -25,6 +27,9 @@ func Open() (*AOF, error) {
 
 func (a *AOF) AppendSet(key, value string, expiry bool) error {
 
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
 	_, err := fmt.Fprintf(a.File, "SET %s %s %t\n", key, value, expiry)
 
 	if err != nil {
@@ -39,6 +44,10 @@ func (a *AOF) AppendSet(key, value string, expiry bool) error {
 }
 
 func (a *AOF) AppendDel(key string) error {
+
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
 	_, err := fmt.Fprintf(a.File, "DEL %s\n", key)
 
 	if err != nil {

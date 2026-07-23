@@ -35,6 +35,12 @@ func main() {
 		log.Fatalf("failed to open AOF: %v", err)
 	}
 
+	defer func() {
+		if err := aof.FileClose(); err != nil {
+			log.Printf("failed to close the AOF : %v", err)
+		}
+	}()
+
 	err = aof.Replay(db)
 	if err != nil {
 		log.Fatalf("failed to replay AOF: %v", err)

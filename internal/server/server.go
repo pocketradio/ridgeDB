@@ -77,11 +77,6 @@ func (s *Server) HandleConnection(conn net.Conn) {
 			continue
 		}
 
-
-		if err != nil {
-			fmt.Fprintln(conn, err)
-		}
-
 		switch cmd.Method {
 		case "SET":
 			fmt.Fprintln(conn, result.Status)

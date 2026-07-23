@@ -15,31 +15,20 @@ func HandleCommand(s []string) (Command, error) {
 			return Command{}, fmt.Errorf("usage: SET <key> <value> <expiry>")
 		}
 
-		userKey := s[1]
-		value := s[2]
-		expiry := s[3]
-
-		_ = userKey
-		_ = value
-		_ = expiry
+		expiry := strings.ToUpper(s[3])
+		if expiry != "TRUE" && expiry != "FALSE" {
+			return Command{}, fmt.Errorf("expiry must be true or false")
+		}
 
 	case "GET":
 		if len(s) != 2 {
 			return Command{}, fmt.Errorf("usage: GET <key>")
 		}
 
-		userKey := s[1]
-
-		_ = userKey
-
 	case "DEL":
 		if len(s) != 2 {
 			return Command{}, fmt.Errorf("usage: DEL <key>")
 		}
-
-		userKey := s[1]
-
-		_ = userKey
 
 	default:
 		return Command{}, fmt.Errorf("unknown command: %s", method)
